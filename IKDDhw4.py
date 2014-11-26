@@ -1,5 +1,3 @@
-#!/usr/bin/python
-# -*- coding=utf-8 -*-
 
 import sys
 import os
@@ -168,7 +166,6 @@ for root, dirs, files in os.walk("webpage_data_5"):
 
 sorted_x = sorted(page.items(), key= operator.itemgetter(1))
 
-print "搜尋: "+query
 print " "
 print "Rank     | Filename"
 
