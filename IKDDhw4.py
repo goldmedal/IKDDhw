@@ -1,7 +1,12 @@
+#!/usr/bin/python
+# -*- coding=utf-8 -*-
+
 import sys
 import os
 import re
 import collections
+import numpy as np
+import operator
 
 # parse the page number
 
@@ -96,23 +101,78 @@ for point in finalList :
        item.append(0)
        i += 1
     for value in point :
-        item[value] = 1/pointLen
+        item[value] = 1.0/float(pointLen)
         
     matrix.append(item)
     key += 1
 
-#
+# matrix count
 
+pageNum = len(matrix)
+pagelist = list()
+i = 0
+while i < pageNum:
+    pagelist.append(1.0/float(pageNum))
+    i += 1
 
+a = np.array(matrix)
+b = np.array(pagelist)
+A = float(b[1])
+B = 10.0
 
+while B-A > 0.0001 :
+    A = B
+    b = np.dot(b,a)
+    B = b[1]
 
+# count the link end point
+# genrate the page rank
 
-            
+pageRank = dict()
+i = 0
 
+for value in b :
+    pageRank[exist[i]] = value
+    i += 1
 
+for item in linkToEnd :
+    rate = 0
+    for key, value in grap.items():
+        if value.count(item) > 0 :
+            rate += (1.0 / float(pageNum) * pageRank[key])
+    pageRank[item] = rate
 
+for item in deadEnd :
+    rate = 0
+    for key, value in grap.items():
+        if value.count(item) > 0 :
+            rate += (pageRank[key])
+    pageRank[item] = rate
 
+query = sys.argv[1]
+page = dict()
 
+for root, dirs, files in os.walk("webpage_data_5"):
+    for name in files:
+        f = open(root+"/"+name)
+        content = f.read()
+        if content.find(query) != -1 :
+       
+            txtfind = name.find('.txt')
+            pageNum = int(name[txtfind-1])
+            page[name] = pageRank[pageNum]
 
+sorted_x = sorted(page.items(), key= operator.itemgetter(1))
+
+print "搜尋: "+query
+print " "
+print "Rank     | Filename"
+
+i = len(sorted_x) - 1
+j = 1
+while i >=0 :
+    print "%-9s| %s" % (j, sorted_x[i][0])
+    i -= 1
+    j += 1
 
 
